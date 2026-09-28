@@ -1,0 +1,25 @@
+check-private-items = true
+cognitive-complexity-threshold = 20
+too-many-arguments-threshold = 5
+too-many-lines-threshold = 80
+type-complexity-threshold = 200
+missing-docs-allow-unused = false
+missing-docs-in-crate-items = false
+avoid-breaking-exported-api = true
+doc-valid-idents = [
+    "COCONUT",
+    "FAIR",
+    "InChI",
+    "InChIKey",
+    "LOTUS",
+    "MS",
+    "MSMS",
+    "PubChem",
+    "SMILES",
+    "Zenodo",
+    "DOI",
+    "RDF",
+    "SPARQL",
+    "..",
+]
+allowed-duplicate-crates = []

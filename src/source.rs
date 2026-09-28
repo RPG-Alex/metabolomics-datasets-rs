@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 /// Describes an upstream source from which a dataset can be obtained.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum DatasetSource {
     /// A dataset published as a Zenodo record.
@@ -9,25 +9,22 @@ pub enum DatasetSource {
         /// The Zenodo record identifier.
         record_id: u64,
     },
-    /// A url to the direct download of the dataset.
+
+    /// A directly downloadable dataset.
     Url {
-        /// The url for the dataset
-        url: &'static str,
+        /// URL from which the dataset can be downloaded.
+        url: String,
     },
 }
 
 /// Describes a known external dataset.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dataset {
-    id: &'static str,
-
+    id: String,
     source: DatasetSource,
-
-    contents: &'static [DatasetContent],
-
+    contents: Vec<DatasetContent>,
     license: DatasetLicense,
-
-    citation: Option<&'static str>,
+    citation: Option<String>,
 }
 impl Dataset {
     /// Creates a dataset description.
@@ -52,8 +49,8 @@ impl Dataset {
 pub struct DatasetLicense {
     status: LicenseStatus,
     expression: Option<LicenseExpression>,
-    license_source: Option<Cow<'static, str>>,
-    notes: Vec<Cow<'static, str>>,
+    license_source: Option<String>,
+    notes: Vec<String>,
 }
 
 impl DatasetLicense {
@@ -110,7 +107,7 @@ pub enum License {
     CcBy4_0,
 
     Custom {
-        name: Cow<'static, str>,
-        url: Option<Cow<'static, str>>,
+        name: String,
+        url: Option<String>,
     },
 }

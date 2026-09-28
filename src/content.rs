@@ -1,4 +1,8 @@
 
-pub struct DatasetContent {
+#[non_exhaustive]
+pub enum DatasetContent {
+    Smiles,
+    MsMs,
+    Inchi, 
     
 }

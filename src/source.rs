@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 /// Describes an upstream source from which a dataset can be obtained.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
@@ -7,23 +9,31 @@ pub enum DatasetSource {
         /// The Zenodo record identifier.
         record_id: u64,
     },
+    /// A url to the direct download of the dataset.
+    Url {
+        /// The url for the dataset
+        url: &'static str,
+    },
 }
 
 /// Describes a known external dataset.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Dataset {
-    /// Human-readable dataset name.
-    name: &'static str,
+    id: &'static str,
 
-    /// Upstream source for the dataset.
     source: DatasetSource,
-}
 
+    contents: &'static [DatasetContent],
+
+    license: DatasetLicense,
+
+    citation: Option<&'static str>,
+}
 impl Dataset {
     /// Creates a dataset description.
     #[must_use]
-    pub const fn new(name: &'static str, source: DatasetSource) -> Self {
-        Self { name, source }
+    pub const fn new(id: &'static str, source: DatasetSource) -> Self {
+        Self { id, source }
     }
 
     /// Returns the dataset's name.
@@ -37,4 +47,70 @@ impl Dataset {
     pub const fn source(&self) -> &DatasetSource {
         &self.source
     }
+}
+
+pub struct DatasetLicense {
+    status: LicenseStatus,
+    expression: Option<LicenseExpression>,
+    license_source: Option<Cow<'static, str>>,
+    notes: Vec<Cow<'static, str>>,
+}
+
+impl DatasetLicense {
+    #[must_use]
+    pub fn with_license_source(
+        mut self, 
+        source: impl Into<Cow<'static, str>>
+    ) -> Self {
+        self.license_source = Some(source.into());
+        self
+    }
+
+    #[must_use]
+    pub fn with_notes<I,S>(mut self, notes: I) -> Self where I: IntoIterator<Item = S>, S: Into<Cow<'static, str>> {
+        self.notes.extend(notes.into_iter().map(Into::into));
+        self
+    }
+}
+
+pub enum LicenseStatus {
+    Known,
+    NotSpecified,
+    Unknown,
+}
+
+pub enum LicenseExpression {
+    License(License),
+    And(Box<LicenseExpression>, Box<LicenseExpression>),
+    Or(Box<LicenseExpression>, Box<LicenseExpression>),
+}
+
+impl LicenseExpression {
+    #[must_use]
+    pub fn and(self, other: impl Into<Self>) -> Self {
+        Self::And(Box::new(self), Box::new(other.into()))
+    }
+
+    #[must_use]
+    pub fn or(self, other: impl Into<Self>) -> Self {
+        Self::Or(Box::new(self), Box::new(other.into()))
+    }
+}
+
+impl From<License> for LicenseExpression {
+    fn from(license: License) -> Self {
+        Self::License(license)
+    }
+}
+
+pub enum License {
+    Apache2,
+    Mit,
+    Cc0_1_0,
+    CcBy4_0,
+
+    Custom {
+        name: Cow<'static, str>,
+        url: Option<Cow<'static, str>>,
+    },
 }

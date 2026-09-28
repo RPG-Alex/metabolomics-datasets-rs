@@ -1,25 +1,29 @@
 check-private-items = true
+missing-docs-allow-unused = false
+missing-docs-in-crate-items = false
+doc-valid-idents = [
+    "COCONUT",
+    "DOI",
+    "FAIR",
+    "GNPS",
+    "InChI",
+    "InChIKey",
+    "LOTUS",
+    "MassIVE",
+    "MS",
+    "MSMS",
+    "PubChem",
+    "RDF",
+    "SMILES",
+    "SPARQL",
+    "Zenodo",
+    "..",
+]
 cognitive-complexity-threshold = 20
 too-many-arguments-threshold = 5
 too-many-lines-threshold = 80
 type-complexity-threshold = 200
-missing-docs-allow-unused = false
-missing-docs-in-crate-items = false
 avoid-breaking-exported-api = true
-doc-valid-idents = [
-    "COCONUT",
-    "FAIR",
-    "InChI",
-    "InChIKey",
-    "LOTUS",
-    "MS",
-    "MSMS",
-    "PubChem",
-    "SMILES",
-    "Zenodo",
-    "DOI",
-    "RDF",
-    "SPARQL",
-    "..",
-]
+warn-on-all-wildcard-imports = true
+allowed-wildcard-imports = []
 allowed-duplicate-crates = []

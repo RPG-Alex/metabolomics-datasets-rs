@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{self, Display};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DatasetLicense {
@@ -79,5 +79,13 @@ pub enum License {
 }
 
 impl Display for License {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            License::Apache2 => todo!(),
+            License::Mit => todo!(),
+            License::Cc0_1_0 => todo!(),
+            License::CcBy4_0 => todo!(),
+            License::Custom { name, url } => todo!(),
+        }
+    }
 }

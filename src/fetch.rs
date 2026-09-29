@@ -1,42 +1,27 @@
-// use std::{env, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 
-// use dirs::cache_dir;
-// use zenodo_rs::ZenodoClient;
+use dirs::cache_dir;
+use zenodo_rs::ZenodoClient;
 
-// #[non_exhaustive]
-// #[derive(Debug, Clone)]
-// pub struct DatasetFetchOptions {
-//     /// Directory used to cache downloaded datasets.
-//     pub cache_dir: PathBuf,
+use crate::{DatasetError, DatasetSource, LocalDataset, MaterializeBuilder};
 
-//     /// Whether an existing cached dataset should be downloaded again.
-//     pub force: bool,
-// }
+pub(crate) async fn materialize_dataset(builder: MaterializeBuilder<'_>) -> Result<LocalDataset, DatasetError> {
+    let MaterializeBuilder { dataset, local_dir} = builder;
+    let root = local_dir.unwrap_or_else(default_dataset_cache_dir).join(dataset.id());
+    fs::create_dir_all(&root).await.map_err(|source| DatasetError::Io { path: root.clone(), source })?;
 
-// impl Default for DatasetFetchOptions {
-//     fn default() -> Self {
-//         Self {
-//             cache_dir: default_dataset_cache_dir(),
-//             force: false,
-//         }
-//     }
-// }
+    let artifacts = match dataset.source() {
+        DatasetSource::Zenodo { record_id } => {
+            fetch_zenodo_dataset(dataset, *record_id, &root).await?
+        },
+        DatasetSource::Url { direct_url } => {
+            vec![fetch_url_dataset(dataset, direct_url, &root).await?]
+        },
+    };
 
-// /// Returns the default cache directory used by dataset fetching.
-// ///
-// /// # Example
-// /// ```
-// /// use metabolomics_datasets_rs::default_dataset_cache_dir;
-// ///
-// /// assert!(default_dataset_cache_dir().ends_with("metabolomics-datasets-rs/
-// datasets")); /// ```
-// pub fn default_dataset_cache_dir() -> PathBuf {
-//     cache_dir().unwrap_or_else(env::temp_dir).join("metabolomics-datasets-rs"
-// ).join("datasets") }
-
-// pub(crate) fn fetch_zenodo_dataset<D>(
-//     dataset: &D,
-//     options: &DatasetFetchOptions,
-// ) -> Result<DatasetArtifact, DatasetError>
-// where
-//     D: ZenodoDatasetSource + ?Sized {}
+    Ok(LocalDataset::new(
+        dataset.clone(),
+        root,
+        artifacts,
+    ))
+}

@@ -854,6 +854,7 @@ dependencies = [
  "dirs",
  "reqwest",
  "thiserror",
+ "tokio",
  "zenodo-rs",
 ]
 

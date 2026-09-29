@@ -13,3 +13,4 @@ pub use dataset::{Dataset, DatasetBuilder, MaterializeBuilder};
 pub use license::{DatasetLicense, License, LicenseExpression, LicenseStatus};
 pub use local::{DatasetArtifact, LocalDataset};
 pub use source::DatasetSource;
+pub use error::DatasetError;

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{DatasetSource, content::DatasetContent, license::DatasetLicense};
+use crate::{DatasetError, DatasetSource, LocalDataset, content::DatasetContent, license::DatasetLicense};
 
 /// Describes a known external dataset.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,21 +106,13 @@ impl DatasetBuilder {
 /// Configures how a [`Dataset`] should be materialized locally.
 #[derive(Debug)]
 pub struct MaterializeBuilder<'a> {
-    dataset: &'a Dataset,
-    local_dir: Option<PathBuf>,
-    extract: bool,
+    pub(crate) dataset: &'a Dataset,
+    pub(crate) local_dir: Option<PathBuf>,
 }
 
 impl<'a> MaterializeBuilder<'a> {
     const fn new(dataset: &'a Dataset) -> Self {
-        Self { dataset, local_dir: None, extract: false }
-    }
-
-    /// Requests extraction of downloaded archives.
-    #[must_use]
-    pub const fn extract(mut self) -> Self {
-        self.extract = true;
-        self
+        Self { dataset, local_dir: None,}
     }
 
     /// Sets the directory in which the dataset should be materialized.
@@ -128,5 +120,9 @@ impl<'a> MaterializeBuilder<'a> {
     pub fn local_dir(mut self, path: impl Into<PathBuf>) -> Self {
         self.local_dir = Some(path.into());
         self
+    }
+
+    pub fn build(self) -> Result<LocalDataset, DatasetError> {
+        crate::fetch::materialize_dataset(self)
     }
 }

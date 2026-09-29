@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DatasetLicense {
     status: LicenseStatus,
@@ -16,14 +15,11 @@ impl DatasetLicense {
             status: LicenseStatus::Unknown,
             expression: None,
             license_source: None,
-            notes: Vec::new()
+            notes: Vec::new(),
         }
     }
     #[must_use]
-    pub fn with_license_source(
-        mut self, 
-        source: String
-    ) -> Self {
+    pub fn with_license_source(mut self, source: String) -> Self {
         self.license_source = Some(source);
         self
     }
@@ -79,14 +75,9 @@ pub enum License {
     Cc0_1_0,
     CcBy4_0,
 
-    Custom {
-        name: String,
-        url: Option<String>,
-    },
+    Custom { name: String, url: Option<String> },
 }
 
 impl Display for License {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        
-    }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
 }

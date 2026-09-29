@@ -15,10 +15,7 @@ pub struct Dataset {
 impl Dataset {
     /// Begins building a dataset description.
     #[must_use]
-    pub fn builder(
-        id: impl Into<String>,
-        source: DatasetSource,
-    ) -> DatasetBuilder {
+    pub fn builder(id: impl Into<String>, source: DatasetSource) -> DatasetBuilder {
         DatasetBuilder::new(id.into(), source)
     }
 
@@ -66,10 +63,7 @@ pub struct DatasetBuilder {
 }
 
 impl DatasetBuilder {
-    fn new(
-        id: String,
-        source: DatasetSource,
-    ) -> Self {
+    fn new(id: String, source: DatasetSource) -> Self {
         Self {
             dataset: Dataset {
                 id,
@@ -83,30 +77,21 @@ impl DatasetBuilder {
 
     /// Adds scientific content classifications to the dataset.
     #[must_use]
-    pub fn contents(
-        mut self,
-        contents: impl IntoIterator<Item = DatasetContent>,
-    ) -> Self {
+    pub fn contents(mut self, contents: impl IntoIterator<Item = DatasetContent>) -> Self {
         self.dataset.contents.extend(contents);
         self
     }
 
     /// Sets the dataset's licensing information.
     #[must_use]
-    pub fn license(
-        mut self,
-        license: DatasetLicense,
-    ) -> Self {
+    pub fn license(mut self, license: DatasetLicense) -> Self {
         self.dataset.license = license;
         self
     }
 
     /// Sets the preferred citation for the dataset.
     #[must_use]
-    pub fn citation(
-        mut self,
-        citation: impl Into<String>,
-    ) -> Self {
+    pub fn citation(mut self, citation: impl Into<String>) -> Self {
         self.dataset.citation = Some(citation.into());
         self
     }
@@ -128,11 +113,7 @@ pub struct MaterializeBuilder<'a> {
 
 impl<'a> MaterializeBuilder<'a> {
     const fn new(dataset: &'a Dataset) -> Self {
-        Self {
-            dataset,
-            local_dir: None,
-            extract: false,
-        }
+        Self { dataset, local_dir: None, extract: false }
     }
 
     /// Requests extraction of downloaded archives.
@@ -144,10 +125,7 @@ impl<'a> MaterializeBuilder<'a> {
 
     /// Sets the directory in which the dataset should be materialized.
     #[must_use]
-    pub fn local_dir(
-        mut self,
-        path: impl Into<PathBuf>,
-    ) -> Self {
+    pub fn local_dir(mut self, path: impl Into<PathBuf>) -> Self {
         self.local_dir = Some(path.into());
         self
     }

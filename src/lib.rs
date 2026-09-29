@@ -1,24 +1,15 @@
 #![doc = include_str!("../README.md")]
 
-mod fetch;
-mod source;
+mod content;
 mod dataset;
 mod datasets;
+mod error;
+mod fetch;
 mod license;
 mod local;
-mod content;
+mod source;
 
-pub use dataset::{
-    Dataset,
-    DatasetBuilder,
-    MaterializeBuilder,
-};
-pub use license::{
-    DatasetLicense,
-    License,
-    LicenseExpression,
-    LicenseStatus
-};
-
+pub use dataset::{Dataset, DatasetBuilder, MaterializeBuilder};
+pub use license::{DatasetLicense, License, LicenseExpression, LicenseStatus};
+pub use local::{DatasetArtifact, LocalDataset};
 pub use source::DatasetSource;
-

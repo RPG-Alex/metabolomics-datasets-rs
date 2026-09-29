@@ -8,5 +8,17 @@ mod license;
 mod local;
 mod content;
 
+pub use dataset::{
+    Dataset,
+    DatasetBuilder,
+    MaterializeBuilder,
+};
+pub use license::{
+    DatasetLicense,
+    License,
+    LicenseExpression,
+    LicenseStatus
+};
+
 pub use source::DatasetSource;
 

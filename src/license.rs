@@ -1,4 +1,7 @@
+use std::fmt::Display;
 
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DatasetLicense {
     status: LicenseStatus,
     expression: Option<LicenseExpression>,
@@ -7,6 +10,15 @@ pub struct DatasetLicense {
 }
 
 impl DatasetLicense {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            status: LicenseStatus::Unknown,
+            expression: None,
+            license_source: None,
+            notes: Vec::new()
+        }
+    }
     #[must_use]
     pub fn with_license_source(
         mut self, 
@@ -18,17 +30,24 @@ impl DatasetLicense {
 
     #[must_use]
     pub fn with_notes(mut self, notes: Vec<String>) -> Self {
-        self.notes = notes;
+        self.notes.extend(notes);
         self
+    }
+
+    #[must_use]
+    pub const fn unknown() -> Self {
+        Self::new()
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LicenseStatus {
     Known,
     NotSpecified,
     Unknown,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LicenseExpression {
     License(License),
     And(Box<LicenseExpression>, Box<LicenseExpression>),
@@ -53,6 +72,7 @@ impl From<License> for LicenseExpression {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum License {
     Apache2,
     Mit,
@@ -63,4 +83,10 @@ pub enum License {
         name: String,
         url: Option<String>,
     },
+}
+
+impl Display for License {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        
+    }
 }

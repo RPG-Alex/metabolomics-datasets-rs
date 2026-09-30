@@ -12,6 +12,12 @@ use crate::{
     Dataset, DatasetArtifact, DatasetError, DatasetSource, LocalDataset, MaterializeBuilder,
 };
 
+/// Returns the default directory used for materialized datasets
+#[must_use]
+pub fn default_dataset_cache_dir() -> PathBuf {
+    cache_dir().unwrap_or_else(env::temp_dir).join(env!("CARGO_PKG_NAME")).join("datasets")
+}
+
 pub(crate) async fn materialize_dataset(
     builder: MaterializeBuilder<'_>,
 ) -> Result<LocalDataset, DatasetError> {
@@ -26,18 +32,14 @@ pub(crate) async fn materialize_dataset(
             fetch_zenodo_dataset(dataset, *record_id, &root).await?
         }
         DatasetSource::Url { direct_url } => {
-            vec![fetch_url_dataset(dataset, direct_url, &root).await?]
+            fetch_url_dataset(dataset, direct_url, &root).await?
         }
     };
 
     Ok(LocalDataset::new(dataset.clone(), root, artifacts))
 }
 
-/// Returns the default directory used for materialized datasets
-#[must_use]
-pub fn default_dataset_cache_dir() -> PathBuf {
-    cache_dir().unwrap_or_else(env::temp_dir).join(env!("CARGO_PKG_NAME")).join("datasets")
-}
+
 
 /// Fetches a dataset from Zenodo
 async fn fetch_zenodo_dataset(
@@ -75,3 +77,9 @@ async fn fetch_zenodo_dataset(
     }
     Ok(artifacts)
 }
+
+async fn fetch_url_dataset(
+    dataset: &Dataset,
+    url: &str,
+    root: &Path
+) -> Result< Vec<DatasetArtifact>, DatasetError> {}

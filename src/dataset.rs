@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 
-use crate::{DatasetError, DatasetSource, LocalDataset, content::DatasetContent, fetch::materialize_dataset, license::DatasetLicense};
+use crate::{
+    DatasetError, DatasetSource, LocalDataset, content::DatasetContent, fetch::materialize_dataset,
+    license::DatasetLicense,
+};
 
 /// Describes a known external dataset.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -112,7 +115,7 @@ pub struct MaterializeBuilder<'a> {
 
 impl<'a> MaterializeBuilder<'a> {
     const fn new(dataset: &'a Dataset) -> Self {
-        Self { dataset, local_dir: None,}
+        Self { dataset, local_dir: None }
     }
 
     /// Sets the directory in which the dataset should be materialized.
@@ -123,10 +126,11 @@ impl<'a> MaterializeBuilder<'a> {
     }
 
     /// Materializes the dataset locally
-    /// 
+    ///
     /// # Errors
-    /// 
-    /// Returns [`DatasetError`] if problem downloading or processing downloaded dataset
+    ///
+    /// Returns [`DatasetError`] if problem downloading or processing downloaded
+    /// dataset
     pub async fn build(self) -> Result<LocalDataset, DatasetError> {
         materialize_dataset(self).await
     }

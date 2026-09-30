@@ -10,7 +10,7 @@ mod local;
 mod source;
 
 pub use dataset::{Dataset, DatasetBuilder, MaterializeBuilder};
+pub use error::DatasetError;
 pub use license::{DatasetLicense, License, LicenseExpression, LicenseStatus};
 pub use local::{DatasetArtifact, LocalDataset};
 pub use source::DatasetSource;
-pub use error::DatasetError;

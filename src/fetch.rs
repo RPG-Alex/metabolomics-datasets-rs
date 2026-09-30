@@ -1,30 +1,36 @@
-use std::{env, ffi::OsStr, path::{Path, PathBuf}};
+use std::{
+    env,
+    ffi::OsStr,
+    path::{Path, PathBuf},
+};
 
 use dirs::cache_dir;
-use zenodo_rs::{RecordId, ZenodoClient};
 use tokio::fs;
+use zenodo_rs::{RecordId, ZenodoClient};
 
-use crate::{Dataset, DatasetArtifact, DatasetError, DatasetSource, LocalDataset, MaterializeBuilder};
+use crate::{
+    Dataset, DatasetArtifact, DatasetError, DatasetSource, LocalDataset, MaterializeBuilder,
+};
 
-pub(crate) async fn materialize_dataset(builder: MaterializeBuilder<'_>) -> Result<LocalDataset, DatasetError> {
-    let MaterializeBuilder { dataset, local_dir} = builder;
+pub(crate) async fn materialize_dataset(
+    builder: MaterializeBuilder<'_>,
+) -> Result<LocalDataset, DatasetError> {
+    let MaterializeBuilder { dataset, local_dir } = builder;
     let root = local_dir.unwrap_or_else(default_dataset_cache_dir).join(dataset.id());
-    fs::create_dir_all(&root).await.map_err(|source| DatasetError::Io { path: root.clone(), source })?;
+    fs::create_dir_all(&root)
+        .await
+        .map_err(|source| DatasetError::Io { path: root.clone(), source })?;
 
     let artifacts = match dataset.source() {
         DatasetSource::Zenodo { record_id } => {
             fetch_zenodo_dataset(dataset, *record_id, &root).await?
-        },
+        }
         DatasetSource::Url { direct_url } => {
             vec![fetch_url_dataset(dataset, direct_url, &root).await?]
-        },
+        }
     };
 
-    Ok(LocalDataset::new(
-        dataset.clone(),
-        root,
-        artifacts,
-    ))
+    Ok(LocalDataset::new(dataset.clone(), root, artifacts))
 }
 
 /// Returns the default directory used for materialized datasets
@@ -39,11 +45,16 @@ async fn fetch_zenodo_dataset(
     record_id: u64,
     root: &Path,
 ) -> Result<Vec<DatasetArtifact>, DatasetError> {
-    let client = ZenodoClient::anonymous_builder().build().map_err(|source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source })?;
-    
+    let client = ZenodoClient::anonymous_builder()
+        .build()
+        .map_err(|source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source })?;
+
     let record_id = RecordId::from(record_id);
 
-    let files = client.list_record_files(record_id).await.map_err(|source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source })?;
+    let files = client
+        .list_record_files(record_id)
+        .await
+        .map_err(|source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source })?;
 
     let mut artifacts = Vec::with_capacity(files.len());
 
@@ -52,14 +63,15 @@ async fn fetch_zenodo_dataset(
 
         let path = root.join(file_name);
 
-        if !fs::try_exists(&path).await.map_err(
-            |source| DatasetError::Io { path: path.clone(), source }
-        )?
+        if !fs::try_exists(&path)
+            .await
+            .map_err(|source| DatasetError::Io { path: path.clone(), source })?
         {
-            client.download_record_file_by_key_to_path(record_id, &file.key, &path).await.map_err(|source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source })?;
+            client.download_record_file_by_key_to_path(record_id, &file.key, &path).await.map_err(
+                |source| DatasetError::Zenodo { dataset_id: dataset.id().to_owned(), source },
+            )?;
         }
         artifacts.push(DatasetArtifact::new(path));
     }
     Ok(artifacts)
 }
-

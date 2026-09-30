@@ -3,7 +3,6 @@ use std::{io, path::PathBuf};
 use thiserror::Error;
 use zenodo_rs::ZenodoError;
 
-
 /// Errors raised while fetching and materializing datasets
 #[derive(Debug, Error)]
 #[non_exhaustive]
@@ -26,7 +25,7 @@ pub enum DatasetError {
         dataset_id: String,
         /// Underlying Zenodo error
         #[source]
-        source: ZenodoError
+        source: ZenodoError,
     },
     /// A filesystem operation failed.
     #[error("failed to access dataset path {path}: {source}")]
